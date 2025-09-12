@@ -1,0 +1,332 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>AI Blog Generator</title>
+    <link rel="icon" type="image/x-icon" href="/static/favicon.ico">
+    <script src="https://cdn.tailwindcss.com"></script>
+    <link href="https://unpkg.com/aos@2.3.1/dist/aos.css" rel="stylesheet">
+    <script src="https://unpkg.com/aos@2.3.1/dist/aos.js"></script>
+    <script src="https://cdn.jsdelivr.net/npm/feather-icons/dist/feather.min.js"></script>
+    <script src="https://unpkg.com/feather-icons"></script>
+    <style>
+        .gradient-bg {
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+        }
+        .blog-card:hover {
+            transform: translateY(-5px);
+            box-shadow: 0 20px 25px -5px rgba(0, 0, 0, 0.1), 0 10px 10px -5px rgba(0, 0, 0, 0.04);
+        }
+        .loading-dots:after {
+            content: '.';
+            animation: dots 1.5s steps(5, end) infinite;
+        }
+        @keyframes dots {
+            0%, 20% { content: '.'; }
+            40% { content: '..'; }
+            60% { content: '...'; }
+            80%, 100% { content: ''; }
+        }
+    </style>
+</head>
+<body class="bg-gray-50">
+    <!-- Header -->
+    <header class="gradient-bg text-white">
+        <nav class="container mx-auto px-6 py-6">
+            <div class="flex items-center justify-between">
+                <div class="flex items-center space-x-4">
+                    <i data-feather="edit-3" class="w-8 h-8"></i>
+                    <span class="text-xl font-bold">AI BlogSmith</span>
+                </div>
+                <div class="hidden md:flex items-center space-x-8">
+                    <a href="#" class="hover:text-gray-300">Home</a>
+                    <a href="#" class="hover:text-gray-300">Templates</a>
+                    <a href="#" class="hover:text-gray-300">Pricing</a>
+                    <button class="bg-white text-indigo-700 px-4 py-2 rounded-lg font-medium hover:bg-gray-100 transition">Sign In</button>
+                </div>
+                <button class="md:hidden focus:outline-none">
+                    <i data-feather="menu" class="w-6 h-6"></i>
+                </button>
+            </div>
+        </nav>
+
+        <!-- Hero Section -->
+        <section class="container mx-auto px-6 py-16 md:py-24">
+            <div class="max-w-3xl mx-auto text-center">
+                <h1 class="text-4xl md:text-6xl font-bold mb-6" data-aos="fade-up">Craft Stunning Blogs with AI</h1>
+                <p class="text-xl md:text-2xl mb-10 text-indigo-100" data-aos="fade-up" data-aos-delay="100">
+                    Transform your ideas into professional blog posts in seconds with OpenAI's powerful language model.
+                </p>
+                <div class="flex flex-col sm:flex-row justify-center gap-4" data-aos="fade-up" data-aos-delay="200">
+                    <button class="bg-white text-indigo-700 px-8 py-3 rounded-lg font-bold hover:bg-gray-100 transition">
+                        Start Generating
+                    </button>
+                    <button class="border-2 border-white px-8 py-3 rounded-lg font-bold hover:bg-white hover:text-indigo-700 transition">
+                        See Examples
+                    </button>
+                </div>
+            </div>
+        </section>
+    </header>
+
+    <!-- Generator Section -->
+    <section class="container mx-auto px-6 py-16 md:py-24">
+        <div class="max-w-4xl mx-auto bg-white rounded-xl shadow-lg overflow-hidden" data-aos="fade-up">
+            <div class="p-6 md:p-8">
+                <h2 class="text-2xl md:text-3xl font-bold mb-6 text-gray-800">Generate Your Blog Post</h2>
+                <div class="space-y-6">
+                    <div>
+                        <label for="topic" class="block text-sm font-medium text-gray-700 mb-2">Blog Topic</label>
+                        <input type="text" id="topic" class="w-full px-4 py-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-indigo-500 focus:border-indigo-500" placeholder="Enter your blog topic...">
+                    </div>
+                    <div>
+                        <label for="tone" class="block text-sm font-medium text-gray-700 mb-2">Writing Tone</label>
+                        <select id="tone" class="w-full px-4 py-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-indigo-500 focus:border-indigo-500">
+                            <option>Professional</option>
+                            <option>Casual</option>
+                            <option>Friendly</option>
+                            <option>Humorous</option>
+                            <option>Academic</option>
+                        </select>
+                    </div>
+                    <div>
+                        <label for="length" class="block text-sm font-medium text-gray-700 mb-2">Length</label>
+                        <select id="length" class="w-full px-4 py-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-indigo-500 focus:border-indigo-500">
+                            <option>Short (300 words)</option>
+                            <option>Medium (600 words)</option>
+                            <option>Long (1000+ words)</option>
+                        </select>
+                    </div>
+                    <button id="generateBtn" class="w-full gradient-bg text-white px-6 py-4 rounded-lg font-bold hover:opacity-90 transition flex items-center justify-center">
+                        <i data-feather="zap" class="w-5 h-5 mr-2"></i>
+                        Generate Blog Post
+                    </button>
+                </div>
+            </div>
+            
+            <div id="resultSection" class="hidden border-t border-gray-200 p-6 md:p-8">
+                <div class="flex justify-between items-center mb-6">
+                    <h3 class="text-xl font-bold text-gray-800">Your Generated Blog</h3>
+                    <button class="text-indigo-600 hover:text-indigo-800 flex items-center">
+                        <i data-feather="download" class="w-4 h-4 mr-1"></i>
+                        Download
+                    </button>
+                </div>
+                <div id="generatedContent" class="prose max-w-none">
+                    <!-- Generated content will appear here -->
+                </div>
+                <div id="loadingIndicator" class="hidden text-center py-8">
+                    <div class="flex justify-center mb-4">
+                        <div class="w-12 h-12 border-4 border-indigo-500 border-t-transparent rounded-full animate-spin"></div>
+                    </div>
+                    <p class="text-gray-600">Generating your blog post<span class="loading-dots"></span></p>
+                </div>
+            </div>
+        </div>
+    </section>
+
+    <!-- Features Section -->
+    <section class="bg-gray-100 py-16 md:py-24">
+        <div class="container mx-auto px-6">
+            <h2 class="text-3xl md:text-4xl font-bold text-center mb-16" data-aos="fade-up">Why Choose AI BlogSmith?</h2>
+            
+            <div class="grid grid-cols-1 md:grid-cols-3 gap-8">
+                <div class="bg-white p-8 rounded-xl shadow-md hover:shadow-lg transition" data-aos="fade-up" data-aos-delay="100">
+                    <div class="w-12 h-12 gradient-bg rounded-lg flex items-center justify-center mb-6">
+                        <i data-feather="clock" class="text-white w-6 h-6"></i>
+                    </div>
+                    <h3 class="text-xl font-bold mb-3 text-gray-800">Instant Content</h3>
+                    <p class="text-gray-600">Generate high-quality blog posts in seconds, saving you hours of writing and research.</p>
+                </div>
+                
+                <div class="bg-white p-8 rounded-xl shadow-md hover:shadow-lg transition" data-aos="fade-up" data-aos-delay="200">
+                    <div class="w-12 h-12 gradient-bg rounded-lg flex items-center justify-center mb-6">
+                        <i data-feather="edit-2" class="text-white w-6 h-6"></i>
+                    </div>
+                    <h3 class="text-xl font-bold mb-3 text-gray-800">Customizable</h3>
+                    <p class="text-gray-600">Tailor the tone, style, and length to match your brand's voice and audience preferences.</p>
+                </div>
+                
+                <div class="bg-white p-8 rounded-xl shadow-md hover:shadow-lg transition" data-aos="fade-up" data-aos-delay="300">
+                    <div class="w-12 h-12 gradient-bg rounded-lg flex items-center justify-center mb-6">
+                        <i data-feather="trending-up" class="text-white w-6 h-6"></i>
+                    </div>
+                    <h3 class="text-xl font-bold mb-3 text-gray-800">SEO Optimized</h3>
+                    <p class="text-gray-600">AI-generated content designed to rank well on search engines and engage readers.</p>
+                </div>
+            </div>
+        </div>
+    </section>
+
+    <!-- Testimonials -->
+    <section class="container mx-auto px-6 py-16 md:py-24">
+        <h2 class="text-3xl md:text-4xl font-bold text-center mb-16" data-aos="fade-up">What Our Users Say</h2>
+        
+        <div class="grid grid-cols-1 md:grid-cols-2 gap-8 max-w-5xl mx-auto">
+            <div class="bg-white p-8 rounded-xl shadow-md" data-aos="fade-up" data-aos-delay="100">
+                <div class="flex items-center mb-4">
+                    <div class="w-12 h-12 rounded-full bg-gray-200 overflow-hidden mr-4">
+                        <img src="http://static.photos/people/200x200/1" alt="User" class="w-full h-full object-cover">
+                    </div>
+                    <div>
+                        <h4 class="font-bold">Sarah Johnson</h4>
+                        <p class="text-gray-600 text-sm">Content Marketer</p>
+                    </div>
+                </div>
+                <p class="text-gray-700">"AI BlogSmith has revolutionized how I create content. I can now produce 3x more blog posts without sacrificing quality. The SEO suggestions are particularly helpful!"</p>
+                <div class="flex mt-4">
+                    <i data-feather="star" class="w-4 h-4 text-yellow-500 fill-current"></i>
+                    <i data-feather="star" class="w-4 h-4 text-yellow-500 fill-current"></i>
+                    <i data-feather="star" class="w-4 h-4 text-yellow-500 fill-current"></i>
+                    <i data-feather="star" class="w-4 h-4 text-yellow-500 fill-current"></i>
+                    <i data-feather="star" class="w-4 h-4 text-yellow-500 fill-current"></i>
+                </div>
+            </div>
+            
+            <div class="bg-white p-8 rounded-xl shadow-md" data-aos="fade-up" data-aos-delay="200">
+                <div class="flex items-center mb-4">
+                    <div class="w-12 h-12 rounded-full bg-gray-200 overflow-hidden mr-4">
+                        <img src="http://static.photos/people/200x200/2" alt="User" class="w-full h-full object-cover">
+                    </div>
+                    <div>
+                        <h4 class="font-bold">Michael Chen</h4>
+                        <p class="text-gray-600 text-sm">Startup Founder</p>
+                    </div>
+                </div>
+                <p class="text-gray-700">"As a non-native English speaker, creating professional blog content was always challenging. AI BlogSmith helps me produce content that sounds natural and engaging."</p>
+                <div class="flex mt-4">
+                    <i data-feather="star" class="w-4 h-4 text-yellow-500 fill-current"></i>
+                    <i data-feather="star" class="w-4 h-4 text-yellow-500 fill-current"></i>
+                    <i data-feather="star" class="w-4 h-4 text-yellow-500 fill-current"></i>
+                    <i data-feather="star" class="w-4 h-4 text-yellow-500 fill-current"></i>
+                    <i data-feather="star" class="w-4 h-4 text-yellow-500 fill-current"></i>
+                </div>
+            </div>
+        </div>
+    </section>
+
+    <!-- CTA Section -->
+    <section class="gradient-bg text-white py-16 md:py-24">
+        <div class="container mx-auto px-6 text-center">
+            <h2 class="text-3xl md:text-4xl font-bold mb-6" data-aos="fade-up">Ready to Transform Your Content?</h2>
+            <p class="text-xl mb-10 max-w-2xl mx-auto text-indigo-100" data-aos="fade-up" data-aos-delay="100">
+                Join thousands of creators and marketers who are saving time and boosting their content quality with AI BlogSmith.
+            </p>
+            <button class="bg-white text-indigo-700 px-8 py-4 rounded-lg font-bold hover:bg-gray-100 transition" data-aos="fade-up" data-aos-delay="200">
+                Get Started - It's Free
+            </button>
+        </div>
+    </section>
+
+    <!-- Footer -->
+    <footer class="bg-gray-900 text-gray-400 py-12">
+        <div class="container mx-auto px-6">
+            <div class="grid grid-cols-1 md:grid-cols-4 gap-8">
+                <div>
+                    <div class="flex items-center space-x-2 mb-4">
+                        <i data-feather="edit-3" class="w-6 h-6 text-indigo-500"></i>
+                        <span class="text-white font-bold">AI BlogSmith</span>
+                    </div>
+                    <p class="mb-4">Empowering creators with AI-generated content that inspires and engages.</p>
+                    <div class="flex space-x-4">
+                        <a href="#" class="hover:text-white transition"><i data-feather="twitter"></i></a>
+                        <a href="#" class="hover:text-white transition"><i data-feather="facebook"></i></a>
+                        <a href="#" class="hover:text-white transition"><i data-feather="linkedin"></i></a>
+                        <a href="#" class="hover:text-white transition"><i data-feather="instagram"></i></a>
+                    </div>
+                </div>
+                
+                <div>
+                    <h4 class="text-white font-bold mb-4">Product</h4>
+                    <ul class="space-y-2">
+                        <li><a href="#" class="hover:text-white transition">Features</a></li>
+                        <li><a href="#" class="hover:text-white transition">Pricing</a></li>
+                        <li><a href="#" class="hover:text-white transition">Templates</a></li>
+                        <li><a href="#" class="hover:text-white transition">API</a></li>
+                    </ul>
+                </div>
+                
+                <div>
+                    <h4 class="text-white font-bold mb-4">Resources</h4>
+                    <ul class="space-y-2">
+                        <li><a href="#" class="hover:text-white transition">Blog</a></li>
+                        <li><a href="#" class="hover:text-white transition">Help Center</a></li>
+                        <li><a href="#" class="hover:text-white transition">Community</a></li>
+                        <li><a href="#" class="hover:text-white transition">Webinars</a></li>
+                    </ul>
+                </div>
+                
+                <div>
+                    <h4 class="text-white font-bold mb-4">Company</h4>
+                    <ul class="space-y-2">
+                        <li><a href="#" class="hover:text-white transition">About Us</a></li>
+                        <li><a href="#" class="hover:text-white transition">Careers</a></li>
+                        <li><a href="#" class="hover:text-white transition">Contact</a></li>
+                        <li><a href="#" class="hover:text-white transition">Legal</a></li>
+                    </ul>
+                </div>
+            </div>
+            
+            <div class="border-t border-gray-800 mt-12 pt-8 flex flex-col md:flex-row justify-between items-center">
+                <p>© 2023 AI BlogSmith. All rights reserved.</p>
+                <div class="flex space-x-6 mt-4 md:mt-0">
+                    <a href="#" class="hover:text-white transition">Privacy Policy</a>
+                    <a href="#" class="hover:text-white transition">Terms of Service</a>
+                    <a href="#" class="hover:text-white transition">Cookies</a>
+                </div>
+            </div>
+        </div>
+    </footer>
+
+    <script>
+        AOS.init();
+        feather.replace();
+        
+        // Demo functionality for the generator
+        document.getElementById('generateBtn').addEventListener('click', function() {
+            const topic = document.getElementById('topic').value;
+            if (!topic) {
+                alert('Please enter a blog topic');
+                return;
+            }
+            
+            const resultSection = document.getElementById('resultSection');
+            const loadingIndicator = document.getElementById('loadingIndicator');
+            const generatedContent = document.getElementById('generatedContent');
+            
+            resultSection.classList.remove('hidden');
+            generatedContent.classList.add('hidden');
+            loadingIndicator.classList.remove('hidden');
+            
+            // Scroll to results
+            resultSection.scrollIntoView({ behavior: 'smooth' });
+            
+            // Simulate API call with timeout
+            setTimeout(function() {
+                loadingIndicator.classList.add('hidden');
+                generatedContent.classList.remove('hidden');
+                
+                // Generate sample content based on inputs
+                const tone = document.getElementById('tone').value;
+                const length = document.getElementById('length').value;
+                
+                let wordCount = 300;
+                if (length.includes('Medium')) wordCount = 600;
+                if (length.includes('Long')) wordCount = 1000;
+                
+                generatedContent.innerHTML = `
+                    <h1>${topic}: A Comprehensive Guide</h1>
+                    <p>Generated in the ${tone.toLowerCase()} tone with approximately ${wordCount} words.</p>
+                    <p>Lorem ipsum dolor sit amet, consectetur adipiscing elit. Nullam in dui mauris. Vivamus hendrerit arcu sed erat molestie vehicula. Sed auctor neque eu tellus rhoncus ut eleifend nibh porttitor. Ut in nulla enim. Phasellus molestie magna non est bibendum non venenatis nisl tempor. Suspendisse dictum feugiat nisl ut dapibus.</p>
+                    <h2>Understanding the Basics</h2>
+                    <p>Vestibulum auctor dapibus neque. Maecenas sed nisi et felis facilisis fermentum. Praesent lobortis, nulla et varius dictum, enim nisl ultricies lorem, quis convallis nisl sem quis odio.</p>
+                    <h2>Advanced Considerations</h2>
+                    <p>Pellentesque habitant morbi tristique senectus et netus et malesuada fames ac turpis egestas. Vestibulum tortor quam, feugiat vitae, ultricies eget, tempor sit amet, ante. Donec eu libero sit amet quam egestas semper.</p>
+                    <p>Generated by AI BlogSmith using OpenAI's powerful language model.</p>
+                `;
+            }, 3000);
+        });
+    </script>
+</body>
+</html>
