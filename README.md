@@ -29,7 +29,7 @@ Backend (optional): Can be connected to Flask / Node.js for actual OpenAI API ca
 
 🚀 Getting Started
 🔹 1. Clone the repository
-git clone https://github.com/your-username/ai-blogsmith.git
+git clone https://github.com/Payalsahu09/blog-generator
 cd ai-blogsmith
 
 🔹 2. Open the project
